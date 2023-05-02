@@ -12,79 +12,116 @@
 
 #include "get_next_line.h"
 
-// reads the file and assigns it to the buffer
-char	*read_buffer_assign(int fd, char *buffer, int *read_status)
+char	*assign_temp_eol(char *line, char *buffer)
 {
+	int		count;
+	char	*temp;
+
+	count = 0;
+	while (buffer[count] != '\n')
+		count++;
+	temp = malloc(count + 2);
+	if (!temp)
+		return (NULL);
+	temp[count + 1] = '\0';
+	temp[count] = '\n';
+	while (count >= 1)
+	{
+		temp[count - 1] = buffer[count - 1];
+		count--;
+	}
+	line = ft_strjoin(line, temp);
+	free(temp);
+	return (line);
+}
+
+char	*assign_temp_eof(char *line, char *buffer)
+{
+	int		count;
+	char	*temp;
+
+	count = 0;
+	while (buffer[count] != '\0')
+		count++;
+	temp = malloc(count + 1);
+	if (!temp)
+		return (NULL);
+	temp[count] = '\0';
+	while (count >= 1)
+	{
+		temp[count - 1] = buffer[count - 1];
+		count--;
+	}
+	line = ft_strjoin(line, temp);
+	free(temp);
+	return (line);
+}
+
+char	*line_cat(char *line, char *buffer, int *end_gnl)
+{
+	if (ft_strchr(buffer, '\n') || ft_strchr(buffer, '\0'))
+	{
+		*end_gnl = 1;
+		if (ft_strchr(buffer, '\0'))
+			line = assign_temp_eol(line, buffer);
+		if (ft_strchr(buffer, '\n'))
+			line = assign_temp_eof(line, buffer);
+	}
+	else
+		line = ft_strjoin(line, buffer);
+	return (line);
+}
+
+char	*read_buffer_assign(int fd, char *line)
+{
+	char	*buffer;
+	int		end_gnl;
 	ssize_t	read_num;
 
 	read_num = -1;
-	buffer = malloc(BUFFER_SIZE * sizeof(char));
-	if (!buffer)
-		return (NULL);
-	read_num = read(fd, buffer, BUFFER_SIZE);
-	if (read_num == -1 || read_num == 0)
+	end_gnl = 0;
+	while (!end_gnl)
 	{
+		buffer = malloc(BUFFER_SIZE + 1);
+		if (!buffer)
+			return (NULL);
+		read_num = read(fd, buffer, BUFFER_SIZE);
+		if (read_num == -1 || read_num == 0)
+		{
+			free(buffer);
+			return (NULL);
+		}
+		buffer[read_num] = '\0';
+		line = line_cat(line, buffer, &end_gnl);
 		free(buffer);
-		return (NULL);
 	}
-	buffer[read_num] = '\0';
-	*read_status = 1;
-	return (buffer);
-}
-
-char	*assign_line(char *buffer, char *line)
-{
-	static int	position;
-	int			count;
-
-	count = 0;
-	line = malloc(line_len(buffer, position) + 1);
-	if (!line)
-		return (NULL);
-	while (buffer[position] != '\n' && buffer[position] != '\0')
-		line[count++] = buffer[position++];
-	if (buffer[position] == '\n')
-	{
-		line[count] = '\n';
-		position++;
-	}
-	else if (buffer[position] == '\0')
-		line[count] = '\0';
 	return (line);
 }
 
 char	*get_next_line(int fd)
 {
-	char			*line;
-	static char		*buffer;
-	static int		read_status;
+	char		*line;
 
+	line = NULL;
 	if (BUFFER_SIZE < 0 || fd < 0)
 		return (NULL);
-	line = NULL;
-	if (read_status == 0)
-		buffer = read_buffer_assign(fd, buffer, &read_status);
-	if (!buffer)
-		return (NULL);
-	line = assign_line(buffer, line);
+	line = read_buffer_assign(fd, line);
 	return (line);
 }
 
 // read_num == 0: EOF is reached
 
-// int	main()
-// {
-// 	int		fd = open("file.txt", O_RDONLY);
-// 	int		newline_num = 4;
+int	main()
+{
+	int		fd = open("file.txt", O_RDONLY);
+	int		newline_num = 4;
 
-// 	if (fd == -1)
-// 		return(1);
-
-// 	while (newline_num + 1 > 0)
-// 	{
-// 		printf("%s", get_next_line(fd));
-// 		newline_num--;
-// 	}
-
-// 	close(fd);
-// }
+	if (fd == -1)
+		return(1);
+	while (newline_num + 1 > 0)
+	{
+		printf("%s", get_next_line(fd));
+		newline_num--;
+	}
+	close(fd);
+}
