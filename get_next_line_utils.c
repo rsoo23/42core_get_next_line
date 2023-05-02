@@ -25,15 +25,18 @@ int	line_len(char *buffer, int position)
 	return (line_len);
 }
 
-int	ft_strchr(char *s, int c)
+int	ft_strchr_pos(char *s, char c)
 {
-	while (*s != c)
+	int	count;
+
+	count = 0;
+	while (count < BUFFER_SIZE)
 	{
-		if (*s == '\0')
-			return (0);
-		s++;
+		if (c == s[count])
+			return (count);
+		count++;
 	}
-	return (1);
+	return (0);
 }
 
 char	*ft_strjoin(char const *s1, char const *s2)
@@ -44,8 +47,6 @@ char	*ft_strjoin(char const *s1, char const *s2)
 
 	i = 0;
 	j = 0;
-	if (!s1 || !s2)
-		return (0);
 	res = malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
 	if (!res)
 		return (0);

@@ -31,7 +31,7 @@ char	*assign_temp_eof(char *line, char *buffer);
 char	*line_cat(char *line, char *buffer, int *end_gnl);
 // get_next_line_utils.c
 int		line_len(char *buffer, int position);
-int		ft_strchr(char *s, int c);
+int		ft_strchr_pos(char *s, char c);
 char	*ft_strjoin(char const *s1, char const *s2);
 size_t	ft_strlen(const char *s);
 

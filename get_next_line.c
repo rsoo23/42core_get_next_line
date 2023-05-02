@@ -12,28 +12,29 @@
 
 #include "get_next_line.h"
 
-char	*assign_temp_eol(char *line, char *buffer)
-{
-	int		count;
-	char	*temp;
+// char	*assign_temp_eol(char *line, char *buffer)
+// {
+// 	int		count;
+// 	char	*temp;
 
-	count = 0;
-	while (buffer[count] != '\n')
-		count++;
-	temp = malloc(count + 2);
-	if (!temp)
-		return (NULL);
-	temp[count + 1] = '\0';
-	temp[count] = '\n';
-	while (count >= 1)
-	{
-		temp[count - 1] = buffer[count - 1];
-		count--;
-	}
-	line = ft_strjoin(line, temp);
-	free(temp);
-	return (line);
-}
+// 	count = 0;
+// 	while (buffer[count] != '\n')
+// 		count++;
+// 	printf("%d\n", count);
+// 	temp = malloc(count + 2);
+// 	if (!temp)
+// 		return (NULL);
+// 	temp[count + 1] = '\0';
+// 	temp[count] = '\n';
+// 	while (count >= 1)
+// 	{
+// 		temp[count - 1] = buffer[count - 1];
+// 		count--;
+// 	}
+// 	line = ft_strjoin(line, temp);
+// 	free(temp);
+// 	return (line);
+// }
 
 char	*assign_temp_eof(char *line, char *buffer)
 {
@@ -41,7 +42,7 @@ char	*assign_temp_eof(char *line, char *buffer)
 	char	*temp;
 
 	count = 0;
-	while (buffer[count] != '\0')
+	while (buffer[count])
 		count++;
 	temp = malloc(count + 1);
 	if (!temp)
@@ -59,13 +60,10 @@ char	*assign_temp_eof(char *line, char *buffer)
 
 char	*line_cat(char *line, char *buffer, int *end_gnl)
 {
-	if (ft_strchr(buffer, '\n') || ft_strchr(buffer, '\0'))
+	if (ft_strchr_pos(buffer, '\0'))
 	{
 		*end_gnl = 1;
-		if (ft_strchr(buffer, '\0'))
-			line = assign_temp_eol(line, buffer);
-		if (ft_strchr(buffer, '\n'))
-			line = assign_temp_eof(line, buffer);
+		line = assign_temp_eof(line, buffer);
 	}
 	else
 		line = ft_strjoin(line, buffer);
@@ -80,11 +78,11 @@ char	*read_buffer_assign(int fd, char *line)
 
 	read_num = -1;
 	end_gnl = 0;
+	buffer = malloc(BUFFER_SIZE + 1);
+	if (!buffer)
+		return (NULL);
 	while (!end_gnl)
 	{
-		buffer = malloc(BUFFER_SIZE + 1);
-		if (!buffer)
-			return (NULL);
 		read_num = read(fd, buffer, BUFFER_SIZE);
 		if (read_num == -1 || read_num == 0)
 		{
@@ -93,8 +91,8 @@ char	*read_buffer_assign(int fd, char *line)
 		}
 		buffer[read_num] = '\0';
 		line = line_cat(line, buffer, &end_gnl);
-		free(buffer);
 	}
+	free(buffer);
 	return (line);
 }
 
@@ -114,14 +112,23 @@ char	*get_next_line(int fd)
 int	main()
 {
 	int		fd = open("file.txt", O_RDONLY);
-	int		newline_num = 4;
 
 	if (fd == -1)
 		return(1);
-	while (newline_num + 1 > 0)
-	{
-		printf("%s", get_next_line(fd));
-		newline_num--;
-	}
+	printf("%s", get_next_line(fd));
 	close(fd);
 }
+
+//File Content:
+// This is line one.\n
+// What is love?
+
+// Buffers: (ex: 4)
+// First call = [This][ is ][line][ one][.\nWh]
+// Line1 =      [This is line one.\nWh]
+// return line  [This is line one.\n]
+// extra buffer [Wh]
+
+// Second call = [at i][s lo][ve?\0]
+// Line2 =       [Wh]+[at i]+[s lo]+[ve?\0]
+
