@@ -19,9 +19,15 @@
 #include <stdio.h>
 #include <fcntl.h>  // open
 
+#ifndef BUFFER_SIZE
+# define BUFFER_SIZE 1024
+#endif
+
 // get_next_line.c
-char			*get_next_line(int fd);
+char	*get_next_line(int fd);
+char	*read_buffer_assign(int fd, char *buffer, int *read_status);
+char	*assign_line(char *buffer, char *line);
 // get_next_line_utils.c
-unsigned int	ft_line_len(char *buffer, int position);
+int     line_len(char *buffer, int position);
 
 #endif

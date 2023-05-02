@@ -10,15 +10,17 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/get_next_line.h"
+#include "get_next_line.h"
 
-unsigned int	ft_line_len(char *buffer, int position)
+int	line_len(char *buffer, int position)
 {
 	int	line_len;
 
-	line_len = 0;
+	line_len = 1;
 	while (buffer[position] != '\n')
+	{
 		line_len++;
+		position++;
+	}
 	return (line_len);
 }
-
