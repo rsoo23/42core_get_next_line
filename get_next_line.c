@@ -15,21 +15,10 @@
 char	*line_cat(char *line, char *buffer, int *end_gnl)
 {
 	if (ft_strchr_pos(buffer, '\0', BUFFER_SIZE) >= 0)
-	{
 		*end_gnl = 1;
-		line = ft_strjoin(line, ft_strdup(buffer));
-	}
 	else if (ft_strchr_pos(buffer, '\n', BUFFER_SIZE) >= 0)
-	{
-		// printf("%s\n", buffer);
 		*end_gnl = 1;
-		line = ft_strjoin(line, buffer);
-	}
-	else
-	{
-		// printf("%s\n", buffer);
-		line = ft_strjoin(line, buffer);
-	}
+	line = ft_strjoin(line, buffer);
 	return (line);
 }
 
@@ -52,7 +41,7 @@ char	*read_buffer_assign(int fd, char *line)
 			free(buffer);
 			return (NULL);
 		}
-		// printf("read:%ld, buffer:%s\n", read_num, buffer);
+		printf("read:%ld, buffer:%s\n", read_num, buffer);
 		buffer[read_num] = '\0';
 		line = line_cat(line, buffer, &end_gnl);
 	}
@@ -63,29 +52,20 @@ char	*read_buffer_assign(int fd, char *line)
 char	*eol_trim(char *line, size_t start, size_t end)
 {
 	char	*trimmed_line;
+	int		count;
 
 	trimmed_line = malloc(end - start + 1);
 	if (!trimmed_line)
 		return (NULL);
-	if (start == 0)
+	count = 0;
+	if (start > 0)
+		end--;
+	while (start + count <= end)
 	{
-		trimmed_line[end + 1] = '\0';
-		while (end >= start)
-		{
-			trimmed_line[end] = line[end];
-			end--;
-		}
+		trimmed_line[count] = line[start + count];
+		count++;
 	}
-	else if (start > 0)
-	{
-		trimmed_line[end - start + 1] = '\0';
-		while (end >= start)
-		{
-			trimmed_line[end] = line[end];
-			end--;
-		}
-	}
-	// printf("%s", trimmed_line);
+	trimmed_line[count] = '\0';
 	return (trimmed_line);
 }
 
@@ -115,11 +95,11 @@ char	*get_next_line(int fd)
 	line = ft_strjoin(eol_buf, line);
 	
 	nl_pos = ft_strchr_pos(line, '\n', line_len);
-	printf("line: %s\n", line);
 	if (nl_pos > 0 && nl_pos != line_len - 1)
 	{
-		eol_buf = eol_trim(line, nl_pos, line_len - 1);
+		eol_buf = eol_trim(line, nl_pos + 1, line_len);
 		line = eol_trim(line, 0, nl_pos);	
+		printf("l:%s, b:%s\n", line, eol_buf);
 	}
 	return (line);
 }
@@ -144,7 +124,9 @@ int	main()
 	// get_next_line(fd);
 	// get_next_line(fd);
 	printf("%s", get_next_line(fd));
+	printf("\n");
 	printf("%s", get_next_line(fd));
+	printf("\n");
 	printf("%s", get_next_line(fd));
 	close(fd);
 }

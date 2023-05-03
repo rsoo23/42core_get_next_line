@@ -33,6 +33,5 @@ char	*eol_trim(char *line, size_t start, size_t end);
 int		ft_strchr_pos(char *s, char c, int len);
 char	*ft_strjoin(char const *s1, char const *s2);
 size_t	ft_strlen(const char *s);
-char	*ft_strdup(const char *s);
 
 #endif
