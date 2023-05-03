@@ -12,31 +12,23 @@
 
 #include "get_next_line.h"
 
-int	line_len(char *buffer, int position)
-{
-	int	line_len;
+// int main()
+// {
+// 	printf("%d", ft_strchr_pos("This_is_line_one.123\nWh", '\n'));
+// }
 
-	line_len = 1;
-	while (buffer[position] != '\n')
-	{
-		line_len++;
-		position++;
-	}
-	return (line_len);
-}
-
-int	ft_strchr_pos(char *s, char c)
+int	ft_strchr_pos(char *s, char c, int len)
 {
 	int	count;
 
 	count = 0;
-	while (count < BUFFER_SIZE)
+	while (count < len)
 	{
 		if (c == s[count])
 			return (count);
 		count++;
 	}
-	return (0);
+	return (-1);
 }
 
 char	*ft_strjoin(char const *s1, char const *s2)
@@ -47,6 +39,8 @@ char	*ft_strjoin(char const *s1, char const *s2)
 
 	i = 0;
 	j = 0;
+	if (!s1 || !s2)
+		return (0);
 	res = malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
 	if (!res)
 		return (0);
@@ -67,4 +61,25 @@ size_t	ft_strlen(const char *s)
 	while (s[i])
 		i++;
 	return (i);
+}
+
+char	*ft_strdup(const char *s)
+{
+	int		i;
+	char	*dest;
+
+	i = 0;
+	while (s[i])
+		i++;
+	dest = malloc(sizeof(char) * (i + 1));
+	if (!dest)
+		return (0);
+	i = 0;
+	while (s[i])
+	{
+		dest[i] = s[i];
+		i++;
+	}
+	dest[i] = '\0';
+	return (dest);
 }

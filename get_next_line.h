@@ -15,6 +15,7 @@
 
 # include <stdlib.h> // malloc, free
 # include <unistd.h> // read, close
+# include <stdint.h>
 // testing
 # include <stdio.h>
 # include <fcntl.h>  // open
@@ -26,13 +27,12 @@
 // get_next_line.c
 char	*get_next_line(int fd);
 char	*read_buffer_assign(int fd, char *line);
-char	*assign_temp_eol(char *line, char *buffer);
-char	*assign_temp_eof(char *line, char *buffer);
 char	*line_cat(char *line, char *buffer, int *end_gnl);
+char	*eol_trim(char *line, size_t start, size_t end);
 // get_next_line_utils.c
-int		line_len(char *buffer, int position);
-int		ft_strchr_pos(char *s, char c);
+int		ft_strchr_pos(char *s, char c, int len);
 char	*ft_strjoin(char const *s1, char const *s2);
 size_t	ft_strlen(const char *s);
+char	*ft_strdup(const char *s);
 
 #endif
