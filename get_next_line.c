@@ -43,7 +43,7 @@ void	read_buffer_assign(int fd, char **line)
 			return ;
 		}
 		buffer[read_num] = '\0';
-		printf("read:%ld, buffer:%s\n", read_num, buffer);
+		// printf("read:%ld, buffer:%s\n", read_num, buffer);
 		*line = line_cat(line, buffer, &end_gnl);
 	}
 	free(buffer);
@@ -83,33 +83,30 @@ char	*get_next_line(int fd)
 	int			nl_pos;
 	int			line_len;
 
+	if (BUFFER_SIZE < 0 || fd < 0)
+		return (NULL);
 	nl_pos = -1;
 	line_len = 0;
 	line = malloc(1);
 	if (!eol_buf)
 		eol_buf = malloc(1);
-	if (BUFFER_SIZE < 0 || fd < 0)
-		return (NULL);
 	read_buffer_assign(fd, &line);
 	
 	// printf("line before combine: %s\n", line);
 	line = ft_strjoin(eol_buf, line);
-
+	eol_buf = malloc(1);
 	// printf("line before trim: %s\n", line);
 	line_len = ft_strlen(line);
 
 	nl_pos = ft_strchr_pos(line, '\n', line_len);
 	// printf("nl_pos:%d\n", nl_pos);
 
-	if (nl_pos > 0)
+	if (nl_pos >= 0 && nl_pos != line_len - 1)
 	{
 		// printf("line_len:%d\n", line_len);
-		if (nl_pos != line_len - 1)
-		{
-			eol_buf = eol_trim(line, nl_pos + 1, line_len);
-			line = eol_trim(line, 0, nl_pos);	
-			// printf("\nline after trim:%s,%s\n", line, eol_buf);
-		}
+		eol_buf = eol_trim(line, nl_pos + 1, line_len);
+		line = eol_trim(line, 0, nl_pos);	
+		// printf("eolbuf: %s\n", eol_buf);
 	}
 	// printf("line_final:%s\n", line);
 	return (line);
@@ -125,21 +122,21 @@ char	*get_next_line(int fd)
 // takes the resulting line and trims it for any excess string (anything after \n)
 // stores it in eol_buf for access in the next gnl call
 
-int	main()
-{
-	int	fd = open("file.txt", O_RDONLY);
+// int	main()
+// {
+// 	int	fd = open("file.txt", O_RDONLY);
 
-	if (fd == -1)
-		return(1);
-	// get_next_line(fd);
-	// get_next_line(fd);
-	// get_next_line(fd);
-	printf("%s", get_next_line(fd));
-	printf("%s", get_next_line(fd));
-	printf("%s", get_next_line(fd));
-	printf("%s", get_next_line(fd));
-	close(fd);
-}
+// 	if (fd == -1)
+// 		return(1);
+// 	// get_next_line(fd);
+// 	// get_next_line(fd);
+// 	// get_next_line(fd);
+// 	printf("%s", get_next_line(fd));
+// 	printf("%s", get_next_line(fd));
+// 	printf("%s", get_next_line(fd));
+// 	printf("%s", get_next_line(fd));
+// 	close(fd);
+// }
 
 //File Content:
 // This is line one.\n
