@@ -26,12 +26,9 @@
 
 // get_next_line.c
 char	*get_next_line(int fd);
-void	read_buffer_assign(int fd, char **line);
-char	*line_cat(char **line, char *buffer, int *end_gnl);
-char	*eol_trim(char *line, int start, int end);
 // get_next_line_utils.c
 int		ft_strchr_pos(char *s, char c, int len);
 char	*ft_strjoin(char const *s1, char const *s2);
-int 	ft_strlen(const char *s);
+int		ft_strlen(const char *s);
 
 #endif
