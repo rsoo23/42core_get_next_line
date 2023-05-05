@@ -27,7 +27,7 @@
 // get_next_line.c
 char	*get_next_line(int fd);
 // get_next_line_utils.c
-int		ft_strchr_pos(char *s, char c, int len);
+int		find_nl_null_pos(char *s, int len);
 char	*ft_strjoin(char const *s1, char const *s2);
 int		ft_strlen(const char *s);
 

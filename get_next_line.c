@@ -18,37 +18,7 @@ static char	*strjoin_free(char *free_str, char *str)
 
 	temp = ft_strjoin(free_str, str);
 	free(free_str);
-	// printf("%s, %d\n", *line, *end_gnl);
 	return (temp);
-}
-
-static void	read_buffer_assign(int fd, char **line)
-{
-	char	*buffer;
-	int		end_gnl;
-	ssize_t	read_num;
-
-	read_num = -1;
-	end_gnl = 0;
-	buffer = malloc(BUFFER_SIZE + 1);
-	if (!buffer)
-		return ;
-	while (!end_gnl)
-	{
-		read_num = read(fd, buffer, BUFFER_SIZE);
-		if (read_num == -1)
-			break ;
-		buffer[read_num] = '\0';
-		if (ft_strchr_pos(buffer, '\0', BUFFER_SIZE) >= 0)
-			end_gnl = 1;
-		else if (ft_strchr_pos(buffer, '\n', BUFFER_SIZE) >= 0)
-			end_gnl = 1;
-		// printf("read:%ld, buffer:%s\n", read_num, buffer);
-		*line = strjoin_free(*line, buffer);
-	}
-	free(buffer);
-	// printf("line: %s\n", *line);
-	return ;
 }
 
 static char	*eol_trim(char *line, int start, int end)
@@ -68,13 +38,41 @@ static char	*eol_trim(char *line, int start, int end)
 		count++;
 	}
 	trimmed_line[count] = '\0';
+	if (start != 0)
+		free(line);
 	return (trimmed_line);
 }
 
-//  01234567890123456 789 
-// [This is line one.\nWh]
-// [                   ]
-// start = 0, end = 17
+static char	*read_buffer_assign(int fd, char *line)
+{
+	char	*buffer;
+	ssize_t	read_num;
+
+	read_num = 1;
+	if (!line)
+		line = malloc(1);
+	buffer = malloc(BUFFER_SIZE + 1);
+	if (!buffer || !line)
+		return (NULL);
+	while (read_num > 0)
+	{
+		read_num = read(fd, buffer, BUFFER_SIZE);
+		if (read_num == -1)
+		{
+			free(buffer);
+			return (NULL);
+		}
+		buffer[read_num] = '\0';
+		// printf("read:%ld, buffer:%s\n", read_num, buffer);
+		if (find_nl_null_pos(buffer, BUFFER_SIZE) >= 0)
+			read_num = -1;
+		line = strjoin_free(line, buffer);
+	}
+	free(buffer);
+	// printf("line: %s\n", line);
+	return(line);
+}
+
 
 char	*get_next_line(int fd)
 {
@@ -87,26 +85,19 @@ char	*get_next_line(int fd)
 		return (NULL);
 	nl_pos = -1;
 	line_len = 0;
-	line = malloc(1);
-	if (eol_buf)
-		eol_buf = malloc(1);
-	if (!line || !eol_buf)
-		return (NULL);
-	read_buffer_assign(fd, &line);
-	// printf("line before combine: %s\n", line);
-	line = ft_strjoin(eol_buf, line);
-	// printf("line before trim: %s\n", line);
-	line_len = ft_strlen(line);
-	nl_pos = ft_strchr_pos(line, '\n', line_len);
+	eol_buf = read_buffer_assign(fd, eol_buf);
+	// printf("line before trim: %s\n", eol_buf);
+	line_len = ft_strlen(eol_buf);
+	nl_pos = find_nl_null_pos(eol_buf, line_len);
 	// printf("nl_pos:%d\n", nl_pos);
-	if (nl_pos >= 0 && nl_pos != line_len - 1)
+	if (nl_pos >= 0 && eol_buf[nl_pos + 1] != '\0')
 	{
-		// printf("line_len:%d\n", line_len);
-		eol_buf = eol_trim(line, nl_pos + 1, line_len);
-		line = eol_trim(line, 0, nl_pos);	
+		line = eol_trim(eol_buf, 0, nl_pos);	
+		eol_buf = eol_trim(eol_buf, nl_pos + 1, line_len);
 		// printf("eolbuf: %s\n", eol_buf);
 	}
-	// printf("line_final:%s\n", line);
+	else if (nl_pos == -1 && eol_buf[line_len] == '\0')
+		return (eol_buf);
 	return (line);
 }
 
@@ -129,12 +120,14 @@ int	main()
 	// get_next_line(fd);
 	// get_next_line(fd);
 	// get_next_line(fd);
-	printf("%s", get_next_line(fd));
-	printf("%s", get_next_line(fd));
-	printf("%s", get_next_line(fd));
-	printf("%s", get_next_line(fd));
+	printf("1: %s", get_next_line(fd));
+	printf("2: %s", get_next_line(fd));
+	printf("3: %s", get_next_line(fd));
+	printf("4: %s", get_next_line(fd));
 	close(fd);
 }
+
+// cc -Wall -Wextra -Werror -D BUFFER_SIZE=4 *.c && ./a.out
 
 //File Content:
 // This is line one.\n

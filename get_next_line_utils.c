@@ -14,17 +14,17 @@
 
 // int main()
 // {
-// 	printf("%d", ft_strchr_pos("This_is_line_one.123\nWh", '\n'));
+// 	printf("%d", find_nl_null_pos("This_is_line_one.123\nWh", '\n'));
 // }
 
-int	ft_strchr_pos(char *s, char c, int len)
+int	find_nl_null_pos(char *s, int len)
 {
 	int	count;
 
 	count = 0;
 	while (count < len)
 	{
-		if (c == s[count])
+		if (s[count] == '\0' || s[count] == '\n')
 			return (count);
 		count++;
 	}
