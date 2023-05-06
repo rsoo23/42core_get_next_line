@@ -26,10 +26,10 @@ static char	*eol_trim(char *line, int start, int end)
 	char	*trimmed_line;
 	int		count;
 
+	count = 0;
 	trimmed_line = malloc(end - start + 1);
 	if (!trimmed_line)
 		return (NULL);
-	count = 0;
 	if (start > 0)
 		end--;
 	while (start + count <= end)
@@ -38,7 +38,7 @@ static char	*eol_trim(char *line, int start, int end)
 		count++;
 	}
 	trimmed_line[count] = '\0';
-	if (start != 0)
+	if (start > 0)
 		free(line);
 	return (trimmed_line);
 }
@@ -89,16 +89,14 @@ char	*get_next_line(int fd)
 	// printf("line before trim: %s\n", eol_buf);
 	line_len = ft_strlen(eol_buf);
 	nl_pos = find_nl_null_pos(eol_buf, line_len);
-	// printf("nl_pos:%d\n", nl_pos);
-	if (nl_pos >= 0 && eol_buf[nl_pos + 1] != '\0')
+	if (nl_pos >= 0)
 	{
 		line = eol_trim(eol_buf, 0, nl_pos);	
 		eol_buf = eol_trim(eol_buf, nl_pos + 1, line_len);
 		// printf("eolbuf: %s\n", eol_buf);
+		return(line);
 	}
-	else if (nl_pos == -1 && eol_buf[line_len] == '\0')
-		return (eol_buf);
-	return (line);
+	return(eol_buf);
 }
 
 // read_buffer_assign: 
