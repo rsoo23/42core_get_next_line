@@ -27,8 +27,10 @@
 // get_next_line.c
 char	*get_next_line(int fd);
 // get_next_line_utils.c
-int		find_nl_null_pos(char *s, int len);
+int     ft_strchr(char *s, char c, int len);
 char	*ft_strjoin(char const *s1, char const *s2);
 int		ft_strlen(const char *s);
+void	ft_bzero(void *s, size_t n);
+void	*ft_calloc(size_t n_elem, size_t size);
 
 #endif

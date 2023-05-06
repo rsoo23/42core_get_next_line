@@ -14,19 +14,19 @@
 
 // int main()
 // {
-// 	printf("%d", find_nl_null_pos("This_is_line_one.123\nWh", '\n'));
+// 	printf("%d", ft_strchr("This_is_line_one.123\nWh", '\n', BUFFER_SIZE));
 // }
 
-int	find_nl_null_pos(char *s, int len)
+int	ft_strchr(char *s, char c, int len)
 {
-	int	count;
+	int	i;
 
-	count = 0;
-	while (count < len)
+	i = 0;
+	while (i < len)
 	{
-		if (s[count] == '\0' || s[count] == '\n')
-			return (count);
-		count++;
+		if (s[i] == c)
+			return (i);
+		i++;
 	}
 	return (-1);
 }
@@ -41,7 +41,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	j = 0;
 	if (!s1 || !s2)
 		return (0);
-	res = malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
+	res = malloc((ft_strlen(s1) + ft_strlen(s2)) * sizeof(char) + 1);
 	if (!res)
 		return (0);
 	while (s1[i])
@@ -55,10 +55,32 @@ char	*ft_strjoin(char const *s1, char const *s2)
 
 int	ft_strlen(const char *s)
 {
-	size_t	i;
+	int	i;
 
 	i = 0;
 	while (s[i])
 		i++;
 	return (i);
+}
+
+void	*ft_calloc(size_t n_elem, size_t size)
+{
+	size_t	*ptr;
+
+	ptr = malloc(n_elem * size);
+	if (!ptr || n_elem == 0 || size == 0)
+		return (0);
+	ft_bzero(ptr, n_elem * size);
+	return (ptr);
+}
+
+void	ft_bzero(void *s, size_t n)
+{
+	size_t			i;
+	unsigned char	*ptr;
+
+	ptr = (unsigned char *)s;
+	i = 0;
+	while (i < n)
+		ptr[i++] = 0;
 }

@@ -27,19 +27,15 @@ static char	*eol_trim(char *line, int start, int end)
 	int		count;
 
 	count = 0;
-	trimmed_line = malloc(end - start + 1);
-	if (!trimmed_line)
-		return (NULL);
+	trimmed_line = ft_calloc(end - start + 1, sizeof(char));
 	if (start > 0)
 		end--;
-	while (start + count <= end)
+	while (start + count < end)
 	{
 		trimmed_line[count] = line[start + count];
 		count++;
 	}
 	trimmed_line[count] = '\0';
-	if (start > 0)
-		free(line);
 	return (trimmed_line);
 }
 
@@ -49,22 +45,20 @@ static char	*read_buffer_assign(int fd, char *line)
 	ssize_t	read_num;
 
 	read_num = 1;
-	if (!line)
-		line = malloc(1);
-	buffer = malloc(BUFFER_SIZE + 1);
-	if (!buffer || !line)
-		return (NULL);
+	buffer = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
 	while (read_num > 0)
 	{
 		read_num = read(fd, buffer, BUFFER_SIZE);
-		if (read_num == -1)
+		if (read_num == -1 || buffer[0] == '\0')
 		{
 			free(buffer);
 			return (NULL);
 		}
 		buffer[read_num] = '\0';
 		// printf("read:%ld, buffer:%s\n", read_num, buffer);
-		if (find_nl_null_pos(buffer, BUFFER_SIZE) >= 0)
+		if (ft_strchr(buffer, '\n', BUFFER_SIZE) >= 0)
+			read_num = -1;
+		if (ft_strchr(buffer, '\0', BUFFER_SIZE) >= 0)
 			read_num = -1;
 		line = strjoin_free(line, buffer);
 	}
@@ -73,30 +67,43 @@ static char	*read_buffer_assign(int fd, char *line)
 	return(line);
 }
 
+static char *process_line(char **buf, char *unt_l)
+{
+	int		nl_pos;
+	int		line_len;
+	char	*out_l;
+
+	nl_pos = -1;
+	line_len = 0;
+	line_len = ft_strlen(unt_l);
+	nl_pos = ft_strchr(unt_l, '\n', line_len);
+	if (nl_pos == 0 && unt_l[1] == '\0')
+		return (unt_l);
+	else if (nl_pos >= 0 && ft_strchr(unt_l, '\0', line_len) == -1)
+	{
+		*buf = eol_trim(unt_l, nl_pos + 1, line_len);
+		out_l = eol_trim(unt_l, 0, nl_pos + 1);
+		free(unt_l);
+		return (out_l);
+		// printf("eolbuf: %s\n", eol_buf);
+	}
+	return (unt_l);
+}
 
 char	*get_next_line(int fd)
 {
 	static char	*eol_buf;
-	char		*line;
-	int			nl_pos;
-	int			line_len;
+	char		*untrimmed_line;
 
-	if (BUFFER_SIZE < 0 || fd < 0)
+	if (!eol_buf)
+		eol_buf = ft_calloc(1, sizeof(char));
+	if (BUFFER_SIZE <= 0 || fd < 0)
 		return (NULL);
-	nl_pos = -1;
-	line_len = 0;
-	eol_buf = read_buffer_assign(fd, eol_buf);
+	untrimmed_line = read_buffer_assign(fd, eol_buf);
+	if (!untrimmed_line)
+		return (NULL);
 	// printf("line before trim: %s\n", eol_buf);
-	line_len = ft_strlen(eol_buf);
-	nl_pos = find_nl_null_pos(eol_buf, line_len);
-	if (nl_pos >= 0)
-	{
-		line = eol_trim(eol_buf, 0, nl_pos);	
-		eol_buf = eol_trim(eol_buf, nl_pos + 1, line_len);
-		// printf("eolbuf: %s\n", eol_buf);
-		return(line);
-	}
-	return(eol_buf);
+	return(process_line(&eol_buf, untrimmed_line));
 }
 
 // read_buffer_assign: 
@@ -109,21 +116,23 @@ char	*get_next_line(int fd)
 // takes the resulting line and trims it for any excess string
 // (anything after \n) stores it in eol_buf for access in the next gnl call
 
-int	main()
-{
-	int	fd = open("file.txt", O_RDONLY);
+// int	main()
+// {
+// 	int	fd = open("file.txt", O_RDONLY);
 
-	if (fd == -1)
-		return(1);
-	// get_next_line(fd);
-	// get_next_line(fd);
-	// get_next_line(fd);
-	printf("1: %s", get_next_line(fd));
-	printf("2: %s", get_next_line(fd));
-	printf("3: %s", get_next_line(fd));
-	printf("4: %s", get_next_line(fd));
-	close(fd);
-}
+// 	if (fd == -1)
+// 		return(1);
+// 	// get_next_line(fd);
+// 	// get_next_line(fd);
+// 	// get_next_line(fd);
+// 	printf("1: %s", get_next_line(fd));
+// 	printf("2: %s", get_next_line(fd));
+// 	printf("3: %s", get_next_line(fd));
+// 	printf("4: %s", get_next_line(fd));
+// 	printf("5: %s", get_next_line(fd));
+// 	printf("6: %s", get_next_line(fd));
+// 	close(fd);
+// }
 
 // cc -Wall -Wextra -Werror -D BUFFER_SIZE=4 *.c && ./a.out
 
