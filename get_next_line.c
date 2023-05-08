@@ -12,36 +12,7 @@
 
 #include "get_next_line.h"
 
-static char	*strjoin_free(char *free_str, char *str)
-{
-	char	*temp;
-
-	temp = ft_strjoin(free_str, str);
-	free(free_str);
-	return (temp);
-}
-
-static char	*eol_trim(char *line, size_t start, size_t end)
-{
-	char	*trimmed_line;
-	size_t	count;
-
-	count = 0;
-	trimmed_line =  ft_calloc(end - start + 1, sizeof(char));
-	if (!trimmed_line)
-		return (NULL);
-	if (start > 0)
-		end--;
-	while (start + count < end)
-	{
-		trimmed_line[count] = line[start + count];
-		count++;
-	}
-	trimmed_line[count] = '\0';
-	return (trimmed_line);
-}
-
-static char	*read_buffer_assign(int fd, char *line)
+char	*read_buffer_assign(int fd, char *line)
 {
 	char	*buffer;
 	ssize_t	read_num;
@@ -52,60 +23,86 @@ static char	*read_buffer_assign(int fd, char *line)
 		return (NULL);
 	while (read_num > 0)
 	{
-		if (!line)
-			line = ft_calloc(1, 1);
 		read_num = read(fd, buffer, BUFFER_SIZE);
 		// printf("read:%ld, buffer:%s\n", read_num, buffer);
 		if (read_num == -1 || buffer[0] == '\0')
 		{
-			free(line);
 			free(buffer);
 			return (NULL);
 		}
 		buffer[read_num] = '\0';
-		line = strjoin_free(line, buffer);
-		if (ft_strchr(buffer, '\n', BUFFER_SIZE) >= 0)
+		line = ft_strjoin(line, buffer);
+		if (ft_strchr(buffer, '\n') >= 0)
 			break ;
 	}
 	free(buffer);
 	return (line);
 }
 
-static char *process_line(char **buf, char *unt_l)
+static char *get_trimmed_line(char *unt_l)
 {
-	int		nl_pos;
-	size_t	line_len;
-	char	*out_l;
+	size_t	len;
+	char	*trm_l;
 
-	line_len = 0;
-	line_len = ft_strlen(unt_l);
-	nl_pos = ft_strchr(unt_l, '\n', line_len);
-	if (nl_pos == 0 && unt_l[1] == '\0')
-		return (unt_l);
-	else if (nl_pos == (int)(line_len - 1))
-		return (unt_l);
-	else if (nl_pos >= 0 && ft_strchr(unt_l, '\0', line_len) == -1)
+	len = 0;
+	while (unt_l && unt_l[len] != '\n')
+		len++;
+	trm_l = ft_calloc(len + 2, sizeof(char));
+	if (!trm_l)
+		return (NULL);
+	len = 0;
+	while (unt_l[len] && unt_l[len] != '\n')
 	{
-		*buf = eol_trim(unt_l, nl_pos + 1, line_len);
-		// printf("buf:%s\n", *buf);
-		out_l = eol_trim(unt_l, 0, nl_pos + 1);
-		free(unt_l);
-		return (out_l);
+		trm_l[len] = unt_l[len];
+		len++;
 	}
-	return (unt_l);
+	if (unt_l && unt_l[len] == '\n')
+		trm_l[len++] = '\n';
+	trm_l[len] = '\0';
+	return (trm_l);
+}
+
+static char *get_eol_buf(char *unt_l, char *buf)
+{
+	size_t	len;
+	size_t	buf_count;
+
+	len = 0;
+	buf_count = 0;
+	while (unt_l && unt_l[len] != '\n')
+		len++;
+	len++;
+	if (unt_l[len] == '\0')
+		return (NULL);
+	buf = ft_calloc(ft_strlen(unt_l) - len + 1, sizeof(char));
+	if (!buf)
+		return (NULL);
+	while (unt_l[len])
+		buf[buf_count++] = unt_l[len++];
+	buf[buf_count] = '\0';
+	return (buf);
 }
 
 char	*get_next_line(int fd)
 {
 	static char	*eol_buf;
 	char		*untrimmed_line;
+	char		*trimmed_line;
 
 	if (BUFFER_SIZE <= 0 || fd < 0)
 		return (NULL);
 	untrimmed_line = read_buffer_assign(fd, eol_buf);
 	if (!untrimmed_line)
 		return (NULL);
-	return(process_line(&eol_buf, untrimmed_line));
+	if (ft_strchr(untrimmed_line, '\n') >= 0)
+	{
+		trimmed_line = get_trimmed_line(untrimmed_line);
+		eol_buf = get_eol_buf(untrimmed_line, eol_buf);
+		// printf("eol_buf: %s\n\n", eol_buf);
+		free(untrimmed_line);
+		return(trimmed_line);
+	}
+	return(untrimmed_line);
 }
 
 // read_buffer_assign: 
@@ -134,29 +131,6 @@ char	*get_next_line(int fd)
 // 	printf("5: %s", get_next_line(fd));
 // 	printf("6: %s", get_next_line(fd));
 // 	close(fd);
-// }
+// } 
 
 // cc -Wall -Wextra -Werror -D BUFFER_SIZE=4 *.c && ./a.out
-
-//File Content:
-// This is line one.\n
-// What is love?
-
-// [This ][is li][ne on][e.\nWh]
-// [this i][s line][ one.\n]
-
-// BUFFER_SIZE=4
-// First call = [This][ is ][line][ one][.\nWh]
-// Line1 =      [This is line one.\nWh]
-// return line  [This is line one.\n]
-// extra buffer [Wh]
-
-// Second call = [at i][s lo][ve?\n]
-// Line2 =       [Wh]+[at i]+[s lo]+[ve?\n]
-// return line  [This is line one.\n]
-// extra buffer []
-
-// Third call = [This][ als][o th][e th][ird ][line][.\nCo]
-// Line2 =       [Wh]+[at i]+[s lo]+[ve?\n]
-// return line  [This is line one.\n]
-// extra buffer []
