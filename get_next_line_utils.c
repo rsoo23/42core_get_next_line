@@ -12,14 +12,9 @@
 
 #include "get_next_line.h"
 
-// int main()
-// {
-// 	printf("%d", ft_strchr("This_is_line_one.123\nWh", '\n', BUFFER_SIZE));
-// }
-
-int	ft_strchr(char *s, char c, int len)
+int	ft_strchr(char *s, char c, size_t len)
 {
-	int	i;
+	size_t	i;
 
 	i = 0;
 	while (i < len)
@@ -39,9 +34,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 
 	i = 0;
 	j = 0;
-	if (!s1 || !s2)
-		return (0);
-	res = malloc((ft_strlen(s1) + ft_strlen(s2)) * sizeof(char) + 1);
+	res = malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
 	if (!res)
 		return (0);
 	while (s1[i])
@@ -53,9 +46,9 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	return (res);
 }
 
-int	ft_strlen(const char *s)
+size_t	ft_strlen(const char *s)
 {
-	int	i;
+	size_t i;
 
 	i = 0;
 	while (s[i])

@@ -1,5 +1,2 @@
-This_is_line_one.
-
-What_is_love?
-
-Afternoon_is_good.
+013456789
+9
