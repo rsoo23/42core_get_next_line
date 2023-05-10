@@ -12,31 +12,37 @@
 
 #include "get_next_line.h"
 
-char	*get_next_line(int fd)
+char	*read_buffer_assign(int fd, char *endofline_buf)
 {
-	static char	*endofline_buf;
-	char		*trimmed_line;
-	char		*buffer;
-	int			read_num;
+	int		read_num;
+	char	*buffer;
 
-	if (BUFFER_SIZE <= 0 || fd < 0)
-		return (NULL);
 	read_num = 1;
 	buffer = malloc((BUFFER_SIZE + 1) * sizeof(char));
 	if (!buffer)
 		return (NULL);
-	while (!ft_newline_in_str(endofline_buf))
+	while (ft_find_newline_pos(endofline_buf) == -1)
 	{
 		read_num = read(fd, buffer, BUFFER_SIZE);
 		if (read_num <= 0)
 			break ;
 		buffer[read_num] = '\0';
-		//printf("eolbuf: %s, count: %d", endofline_buf, count);
 		endofline_buf = ft_strjoin(endofline_buf, buffer);
 	}
 	free(buffer);
 	if (read_num == -1)
 		return (NULL);
+	return (endofline_buf);
+}
+
+char	*get_next_line(int fd)
+{
+	static char	*endofline_buf;
+	char		*trimmed_line;
+
+	if (BUFFER_SIZE <= 0 || fd < 0)
+		return (NULL);
+	endofline_buf = read_buffer_assign(fd, endofline_buf);
 	trimmed_line = get_trimmed_line(endofline_buf);
 	endofline_buf = get_endofline_buf(endofline_buf);
 	return (trimmed_line);

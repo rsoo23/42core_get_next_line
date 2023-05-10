@@ -12,17 +12,20 @@
 
 #include "get_next_line.h"
 
-int	ft_newline_in_str(char *str)
+int	ft_find_newline_pos(char *str)
 {
+	int	i;
+
+	i = 0;
 	if (!str)
-		return (0);
-	while (*str)
+		return (-1);
+	while (str[i])
 	{
-		if (*str == '\n')
-			return (1);
-		str++;
+		if (str[i] == '\n')
+			return (i);
+		i++;
 	}
-	return (0);
+	return (-1);
 }
 
 char	*ft_strjoin(const char *s1, const char *s2)
@@ -60,49 +63,68 @@ size_t	ft_strlen(const char *s)
 
 char	*get_trimmed_line(char *untrimmed_line)
 {
-	size_t	len;
+	int		len;
+	int		nl_pos;
 	char	*trimmed_line;
 
-	len = 0;
+	len = -1;
 	if (!ft_strlen(untrimmed_line))
 		return (NULL);
-	while (untrimmed_line[len] && untrimmed_line[len] != '\n')
-		len++;
-	trimmed_line = malloc((len + 2) * sizeof(char));
-	if (!trimmed_line)
-		return (NULL);
-	len = 0;
-	while (untrimmed_line[len] && untrimmed_line[len] != '\n')
+	nl_pos = ft_find_newline_pos(untrimmed_line);
+	if (nl_pos == -1)
 	{
-		trimmed_line[len] = untrimmed_line[len];
-		len++;
+		trimmed_line = ft_strdup(untrimmed_line);
+		return (trimmed_line);
 	}
-	if (untrimmed_line[len] && untrimmed_line[len] == '\n')
-		trimmed_line[len++] = '\n';
-	trimmed_line[len] = '\0';
+	trimmed_line = malloc((nl_pos + 2) * sizeof(char));
+	if (!trimmed_line)
+		return (ft_free_ret_null(trimmed_line));
+	while (len++ <= nl_pos)
+		trimmed_line[len] = untrimmed_line[len];
+	trimmed_line[len - 1] = '\0';
 	return (trimmed_line);
 }
 
 char	*get_endofline_buf(char *buf)
 {
-	size_t	len;
 	size_t	buf_count;
+	int		nl_pos;
 	char	*trimmed_buf;
 
-	len = 0;
 	buf_count = 0;
 	if (!buf)
 		return (ft_free_ret_null(buf));
-	while (buf[len] && buf[len] != '\n')
-		len++;
-	len++;
-	if (buf[len] == '\0')
+	nl_pos = ft_find_newline_pos(buf);
+	if (nl_pos == -1)
 		return (ft_free_ret_null(buf));
-	trimmed_buf = malloc((ft_strlen(buf) - len + 1) * sizeof(char));
+	trimmed_buf = malloc((ft_strlen(buf) - nl_pos) * sizeof(char));
 	if (!trimmed_buf)
-		return (NULL);
-	while (buf[len])
-		trimmed_buf[buf_count++] = buf[len++];
+		return (ft_free_ret_null(trimmed_buf));
+	nl_pos++;
+	while (buf[nl_pos])
+		trimmed_buf[buf_count++] = buf[nl_pos++];
 	trimmed_buf[buf_count] = '\0';
+	free(buf);
 	return (trimmed_buf);
+}
+
+char	*ft_strdup(const char *s)
+{
+	int		i;
+	char	*dest;
+
+	i = 0;
+	if (!s)
+		return (0);
+	while (s[i])
+		i++;
+	dest = malloc(sizeof(char) * (i + 1));
+	i = 0;
+	while (s[i])
+	{
+		dest[i] = s[i];
+		i++;
+	}
+	dest[i] = '\0';
+	return (dest);
 }
