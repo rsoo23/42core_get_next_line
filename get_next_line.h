@@ -26,11 +26,12 @@
 
 // get_next_line.c
 char	*get_next_line(int fd);
+char	*ft_free_ret_null(char *free_str);
 // get_next_line_utils.c
-int     ft_strchr(char *s, char c);
-char	*ft_strjoin(char *s1, char *s2);
-size_t  ft_strlen(const char *s);
-void	*ft_calloc(size_t n_elem, size_t size);
-void	ft_bzero(void *s, size_t n);
+int		ft_newline_in_str(char *str);
+size_t	ft_strlen(const char *s);
+char	*ft_strjoin(const char *s1, const char *s2);
+char	*get_trimmed_line(char *untrimmed_line);
+char	*get_endofline_buf(char *buf);
 
 #endif
