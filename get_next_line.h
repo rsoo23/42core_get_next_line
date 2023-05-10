@@ -15,10 +15,10 @@
 
 # include <stdlib.h> // malloc, free
 # include <unistd.h> // read, close
-# include <stdint.h>
+# include <stdint.h> // size_t
 // testing
-# include <stdio.h>
-# include <fcntl.h>  // open
+// # include <stdio.h>
+// # include <fcntl.h>  // open
 
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 1024
@@ -26,13 +26,13 @@
 
 // get_next_line.c
 char	*get_next_line(int fd);
-char	*ft_free_ret_null(char *free_str);
-// get_next_line_utils.c
-int		ft_find_newline_pos(char *str);
-size_t	ft_strlen(const char *s);
-char	*ft_strjoin(const char *s1, const char *s2);
 char	*get_trimmed_line(char *untrimmed_line);
 char	*get_endofline_buf(char *buf);
+// get_next_line_utils.c
+int		ft_find_newline_pos(char *str);
+char	*ft_strjoin(const char *s1, const char *s2);
+size_t	ft_strlen(const char *s);
+char	*ft_free_ret_null(char *free_str);
 char	*ft_strdup(const char *s);
 
 #endif

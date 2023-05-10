@@ -48,11 +48,51 @@ char	*get_next_line(int fd)
 	return (trimmed_line);
 }
 
-char	*ft_free_ret_null(char *free_str)
+char	*get_trimmed_line(char *untrimmed_line)
 {
-	free(free_str);
-	free_str = NULL;
-	return (NULL);
+	int		len;
+	int		nl_pos;
+	char	*trimmed_line;
+
+	len = -1;
+	if (!ft_strlen(untrimmed_line))
+		return (NULL);
+	nl_pos = ft_find_newline_pos(untrimmed_line);
+	if (nl_pos == -1)
+	{
+		trimmed_line = ft_strdup(untrimmed_line);
+		return (trimmed_line);
+	}
+	trimmed_line = malloc((nl_pos + 2) * sizeof(char));
+	if (!trimmed_line)
+		return (ft_free_ret_null(trimmed_line));
+	while (len++ <= nl_pos)
+		trimmed_line[len] = untrimmed_line[len];
+	trimmed_line[len - 1] = '\0';
+	return (trimmed_line);
+}
+
+char	*get_endofline_buf(char *buf)
+{
+	size_t	buf_count;
+	int		nl_pos;
+	char	*trimmed_buf;
+
+	buf_count = 0;
+	if (!buf)
+		return (ft_free_ret_null(buf));
+	nl_pos = ft_find_newline_pos(buf);
+	if (nl_pos == -1)
+		return (ft_free_ret_null(buf));
+	trimmed_buf = malloc((ft_strlen(buf) - nl_pos) * sizeof(char));
+	if (!trimmed_buf)
+		return (ft_free_ret_null(trimmed_buf));
+	nl_pos++;
+	while (buf[nl_pos])
+		trimmed_buf[buf_count++] = buf[nl_pos++];
+	trimmed_buf[buf_count] = '\0';
+	free(buf);
+	return (trimmed_buf);
 }
 
 // int	main()
