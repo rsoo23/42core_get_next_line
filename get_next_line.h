@@ -28,6 +28,7 @@
 char	*get_next_line(int fd);
 char	*get_trimmed_line(char *untrimmed_line);
 char	*get_endofline_buf(char *buf);
+char	*read_buffer_assign(int fd, char *endofline_buf);
 // get_next_line_utils.c
 int		ft_find_newline_pos(char *str);
 char	*ft_strjoin(const char *s1, const char *s2);

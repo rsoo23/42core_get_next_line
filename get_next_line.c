@@ -10,7 +10,24 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+// Tripouille test: change the timeout to 4,500,000 for big_line test
+
+// cc -Wall -Wextra -Werror -D BUFFER_SIZE=4 *.c && ./a.out
+
 #include "get_next_line.h"
+
+char	*get_next_line(int fd)
+{
+	static char	*endofline_buf;
+	char		*trimmed_line;
+
+	if (BUFFER_SIZE <= 0 || fd < 0)
+		return (NULL);
+	endofline_buf = read_buffer_assign(fd, endofline_buf);
+	trimmed_line = get_trimmed_line(endofline_buf);
+	endofline_buf = get_endofline_buf(endofline_buf);
+	return (trimmed_line);
+}
 
 char	*read_buffer_assign(int fd, char *endofline_buf)
 {
@@ -35,18 +52,6 @@ char	*read_buffer_assign(int fd, char *endofline_buf)
 	return (endofline_buf);
 }
 
-char	*get_next_line(int fd)
-{
-	static char	*endofline_buf;
-	char		*trimmed_line;
-
-	if (BUFFER_SIZE <= 0 || fd < 0)
-		return (NULL);
-	endofline_buf = read_buffer_assign(fd, endofline_buf);
-	trimmed_line = get_trimmed_line(endofline_buf);
-	endofline_buf = get_endofline_buf(endofline_buf);
-	return (trimmed_line);
-}
 
 char	*get_trimmed_line(char *untrimmed_line)
 {
@@ -108,4 +113,3 @@ char	*get_endofline_buf(char *buf)
 // 	close(fd);
 // }
 
-// cc -Wall -Wextra -Werror -D BUFFER_SIZE=4 *.c && ./a.out
