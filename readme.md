@@ -7,4 +7,4 @@ Create a function that returns a line from a text file each time it is called.
 |https://github.com/Tripouille/gnlTester    |all pass|
 
 
-Official Result: Yet to be submitted
+Official Result: 125/100
